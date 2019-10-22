@@ -189,6 +189,8 @@ def validate(args, config):
     if not args.duration:
         if os.environ.get('MFA_STS_DURATION'):
             args.duration = int(os.environ.get('MFA_STS_DURATION'))
+        elif config.has_option(long_term_name, 'duration'):
+            args.duration = config.get(long_term_name, 'duration')
         else:
             args.duration = 3600 if args.assume_role else 43200
 
