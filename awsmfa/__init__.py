@@ -273,10 +273,10 @@ def validate(args, config):
                 % (diff.total_seconds(), exp))
 
     if should_refresh:
-        get_credentials(short_term_name, key_id, access_key, args, config)
+        get_credentials(short_term_name, long_term_name, key_id, access_key, args, config)
 
 
-def get_credentials(short_term_name, lt_key_id, lt_access_key, args, config):
+def get_credentials(short_term_name, long_term_name, lt_key_id, lt_access_key, args, config):
     if args.token:
         logger.debug("Received token as argument")
         mfa_token = '%s' % (args.token)
@@ -371,6 +371,14 @@ def get_credentials(short_term_name, lt_key_id, lt_access_key, args, config):
         'expiration',
         response['Credentials']['Expiration'].strftime('%Y-%m-%d %H:%M:%S')
     )
+
+    if config.has_option(long_term_name, 'region'):
+        config.set(
+            short_term_name,
+            'region',
+            config.get(long_term_name, 'region')
+        )
+
     with open(AWS_CREDS_PATH, 'w') as configfile:
         config.write(configfile)
     logger.info(
