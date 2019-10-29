@@ -374,12 +374,14 @@ def get_credentials(short_term_name, long_term_name, lt_key_id, lt_access_key, a
         response['Credentials']['Expiration'].strftime('%Y-%m-%d %H:%M:%S')
     )
 
-    if config.has_option(long_term_name, 'region'):
-        config.set(
-            short_term_name,
-            'region',
-            config.get(long_term_name, 'region')
-        )
+    # Copy over other aws config options
+    # List taken from - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+    # Excluding those to do with authentication, which we have already handled
+    copy_options = ['region', 's3', 'api_versions', 'ca_bundle', 'cli_follow_urlparam', 'cli_timestamp_format',
+                    'output', 'parameter_validation', 'tcp_keepalive']
+    for copy_option in copy_options:
+        if config.has_option(long_term_name, copy_option):
+            config.set(short_term_name, copy_option, config.get(long_term_name, copy_option))
 
     with open(AWS_CREDS_PATH, 'w') as configfile:
         config.write(configfile)
